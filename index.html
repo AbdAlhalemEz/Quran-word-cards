@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Word Learning</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c7744 0%, #5a9367 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .controls {
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .select-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #444;
+        }
+        
+        select, button {
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            font-size: 1rem;
+            background-color: white;
+            transition: all 0.3s;
+        }
+        
+        select:focus, button:focus {
+            outline: none;
+            border-color: #5a9367;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #5a9367 0%, #2c7744 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-container {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 400px;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .word-card {
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.45s cubic-bezier(.22,.9,.29,1), opacity 0.45s cubic-bezier(.22,.9,.29,1), background-color 0.3s;
+            cursor: pointer;
+            position: relative;
+            background-color: #e3f2fd;
+        }
+
+        /* New slide classes: slide-out moves current card off-screen, slide-in is used before showing new content */
+        .word-card.slide-out {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
+        .word-card.slide-in {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        
+        .word-card.active {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        .word-card:hover {
+            transform: translateY(-5px) scale(1.02);
+        }
+        
+        .arabic-text {
+            font-size: 3.5rem;
+            font-weight: 800;
+            font-family: 'Traditional Arabic', 'Scheherazade New', serif;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            line-height: 1.4;
+        }
+        
+        .transliteration {
+            font-size: 1.8rem;
+            color: #5a9367;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .translation {
+            font-size: 1.4rem;
+            color: #555;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .audio-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .audio-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #5a9367 0%, #2c7744 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .audio-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .progress {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 30px;
+        }
+        
+        .nav-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #5a9367 0%, #2c7744 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .nav-btn:not(:disabled):hover {
+            transform: scale(1.1);
+        }
+        
+        .settings {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        .settings h3 {
+            margin-bottom: 15px;
+            color: #444;
+            text-align: center;
+        }
+        
+        .color-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: transform 0.3s;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-option.active {
+            border-color: #333;
+        }
+        
+        .auto-play-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #5a9367;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .delay-control, .repeat-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .delay-control input, .repeat-control input {
+            width: 80px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            color: #5a9367;
+        }
+        
+        .repeat-indicator {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #5a9367;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 600px) {
+            .arabic-text {
+                font-size: 2.5rem;
+            }
+            
+            .transliteration {
+                font-size: 1.4rem;
+            }
+            
+            .translation {
+                font-size: 1.2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .auto-play-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Quran Word Learning</h1>
+            <div class="subtitle">Learn the Quran word by word with pronunciation and translation</div>
+        </header>
+        
+        <div class="controls">
+            <div class="select-group">
+                <label for="surah-select" data-i18n="label_select_surah">Select Surah:</label>
+                <select id="surah-select">
+                    <option value="">-- Select a Surah --</option>
+                    <!-- Options will be populated by JavaScript -->
+                </select>
+            </div>
+            <div class="select-group" style="min-width:140px;">
+                <label for="lang-select">Language:</label>
+                <select id="lang-select">
+                    <option value="en">English</option>
+                    <option value="ar">العربية</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <i class="fas fa-spinner fa-spin"></i> Loading Surah...
+        </div>
+        
+        <div class="card-container">
+            <div class="word-card active" id="word-card">
+                <div class="arabic-text" id="arabic-text">بِسْمِ</div>
+                <div class="transliteration" id="transliteration">bis'mi</div>
+                <div class="translation" id="translation">In (the) name</div>
+                
+                <!-- Click the card to play audio -->
+                <div class="audio-status" id="audio-status" aria-hidden="true" style="display:none"></div>
+                
+                <div class="progress" id="progress">Word 1 of 7</div>
+                <div class="repeat-indicator" id="repeat-indicator"></div>
+            </div>
+            
+            <!-- Navigation replaced by swipe gestures on the card -->
+        </div>
+        
+        <div class="settings">
+            <h3 data-i18n="heading_customize">Customize Your Experience</h3>
+            
+            <div class="color-options">
+                <div class="color-option active" style="background-color: #e3f2fd;" data-color="#e3f2fd"></div>
+                <div class="color-option" style="background-color: #f3e5f5;" data-color="#f3e5f5"></div>
+                <div class="color-option" style="background-color: #e8f5e9;" data-color="#e8f5e9"></div>
+                <div class="color-option" style="background-color: #fff3e0;" data-color="#fff3e0"></div>
+                <div class="color-option" style="background-color: #ffebee;" data-color="#ffebee"></div>
+                <div class="color-option" style="background-color: #f9fbe7;" data-color="#f9fbe7"></div>
+            </div>
+
+            <div style="text-align:center; margin-bottom:12px">
+                <label for="custom-color" data-i18n="label_custom_color">Custom card color:</label>
+                <input type="color" id="custom-color" value="#e3f2fd">
+            </div>
+
+            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:12px">
+                <div>
+                    <label for="arabic-size" data-i18n="label_arabic_size">Arabic text size (px):</label>
+                    <input id="arabic-size" type="number" min="24" max="120" value="56">
+                </div>
+                <div>
+                    <label for="translit-size" data-i18n="label_translit_size">Transliteration size (px):</label>
+                    <input id="translit-size" type="number" min="12" max="48" value="28">
+                </div>
+                <div>
+                    <label for="translation-size" data-i18n="label_translation_size">Translation size (px):</label>
+                    <input id="translation-size" type="number" min="12" max="32" value="18">
+                </div>
+            </div>
+            <div style="text-align:center; margin-bottom:12px">
+                <label><input type="checkbox" id="show-only-word"> Show only main word</label>
+            </div>
+            
+            <div class="auto-play-controls">
+                <label for="auto-play" data-i18n="label_auto_play">Auto-play:</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="auto-play">
+                    <span class="slider"></span>
+                </label>
+                
+                <div class="delay-control">
+                    <label for="delay" data-i18n="label_delay">Delay (seconds):</label>
+                    <input type="number" id="delay" min="1" max="10" value="3">
+                </div>
+                
+                <div class="repeat-control">
+                    <label for="repeat" data-i18n="label_repeat">Repeat each word:</label>
+                    <input type="number" id="repeat" min="1" max="5" value="1">
+                    <span data-i18n="label_times">times</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Quran Word Learning App &copy; 2023 | Designed for educational purposes</p>
+    </footer>
+
+    <script>
+    // App state
+        let currentSurah = null;
+        let currentWordIndex = 0;
+        let currentAyah = 1;
+        let autoPlayInterval = null;
+        let isPlaying = false;
+        let audio = new Audio();
+        let repeatCount = 0;
+        let currentRepeat = 0;
+    // Swipe variables (make global so handlers can access)
+    let touchStartX = 0;
+    let touchEndX = 0;
+    let mouseDownX = 0;
+    let mouseUpX = 0;
+
+        // DOM elements
+        const surahSelect = document.getElementById('surah-select');
+        const loadingElement = document.getElementById('loading');
+        const wordCard = document.getElementById('word-card');
+        const arabicText = document.getElementById('arabic-text');
+        const transliteration = document.getElementById('transliteration');
+        const translation = document.getElementById('translation');
+        const progress = document.getElementById('progress');
+    const audioStatus = document.getElementById('audio-status');
+        const colorOptions = document.querySelectorAll('.color-option');
+    const customColorInput = document.getElementById('custom-color');
+    const arabicSizeInput = document.getElementById('arabic-size');
+    const translitSizeInput = document.getElementById('translit-size');
+    const translationSizeInput = document.getElementById('translation-size');
+    const showOnlyWordCheckbox = document.getElementById('show-only-word');
+        const autoPlayToggle = document.getElementById('auto-play');
+        const delayInput = document.getElementById('delay');
+        const repeatInput = document.getElementById('repeat');
+        const repeatIndicator = document.getElementById('repeat-indicator');
+
+        // List of Surahs (1 to 114)
+        const surahs = Array.from({length: 114}, (_, i) => i + 1);
+        // Arabic names for surahs (short list placeholder; full 114 names must be provided)
+        const surahNamesArabic = [
+            '',
+            'الفاتحة','البقرة','آل عمران','النساء','المائدة','الأنعام','الأعراف','الأنفال','التوبة','يونس',
+            'هود','يوسف','الرعد','ابراهيم','الحجر','النحل','الإسراء','الكهف','مريم','طه',
+            'الأنبياء','الحج','المؤمنون','النّور','الفرقان','الشعراء','النمل','القصص','العنكبوت','الروم',
+            'لقمان','السجدة','الأحزاب','سبأ','فاطر','يس','الصافات','ص','الزمر','غافر',
+            'فصلت','الشورى','الزخرف','الدخان','الجاثية','الأحقاف','محمد','الفتح','الحجرات','ق',
+            'الذاريات','الطور','النجم','القمر','الرحمن','الواقعة','الحديد','المجادلة','الحشر','الممتحنة',
+            'الصف','الجمعة','المنافقون','التغابن','الطلاق','التحريم','الملك','القلم','الحاقة','المعارج',
+            'نوح','الجن','المزّمّل','المدّثر','القيامة','الإنسان','المرسلات','النبأ','النازعات','عبس',
+            'التكوير','الانفطار','المطففين','الانشقاق','البروج','الطارق','الأعلى','الغاشية','الفجر','البلد',
+            'الشمس','الليل','الضحى','الشرح','التين','العلق','القدر','البينة','الزلزلة','العاديات',
+            'القارعة','التكاثر','العصر','الهمزة','الفيل','قريش','الماعون','الكوثر','الكافرون','النصر',
+            'المسد','الإخلاص','الفلق','الناس'
+        ];
+
+        // Initialize the app
+        function initApp() {
+            // Populate surah select options with Arabic names
+            surahs.forEach(surahNumber => {
+                const option = document.createElement('option');
+                option.value = surahNumber;
+                const name = surahNamesArabic[surahNumber] || `سورة ${surahNumber}`;
+                option.textContent = `${surahNumber} - ${name}`;
+                surahSelect.appendChild(option);
+            });
+
+            // Set up event listeners
+            surahSelect.addEventListener('change', loadSurah);
+            // Card click plays audio
+            wordCard.addEventListener('click', () => {
+                playCurrentWord();
+            });
+            
+            // Swipe functionality for touch devices
+            wordCard.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            
+            wordCard.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+            
+            // Mouse swipe simulation for desktop
+            wordCard.addEventListener('mousedown', e => {
+                mouseDownX = e.clientX;
+            });
+            
+            wordCard.addEventListener('mouseup', e => {
+                mouseUpX = e.clientX;
+                handleMouseSwipe();
+            });
+
+            // Show-only-word toggle
+            showOnlyWordCheckbox.addEventListener('change', () => {
+                const showOnly = showOnlyWordCheckbox.checked;
+                transliteration.style.display = showOnly ? 'none' : '';
+                translation.style.display = showOnly ? 'none' : '';
+                progress.style.display = showOnly ? 'none' : '';
+                repeatIndicator.style.display = showOnly ? 'none' : '';
+                if (audioStatus) audioStatus.style.display = showOnly ? 'none' : '';
+            });
+            
+            // Color selection
+            colorOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    colorOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    const c = option.getAttribute('data-color');
+                    wordCard.style.backgroundColor = c;
+                    customColorInput.value = rgbToHex(c);
+                });
+            });
+
+            // Custom color input
+            customColorInput.addEventListener('input', () => {
+                const c = customColorInput.value;
+                wordCard.style.backgroundColor = c;
+                colorOptions.forEach(opt => opt.classList.remove('active'));
+            });
+
+            // Text size controls
+            const applyTextSizes = () => {
+                arabicText.style.fontSize = arabicSizeInput.value + 'px';
+                transliteration.style.fontSize = translitSizeInput.value + 'px';
+                translation.style.fontSize = translationSizeInput.value + 'px';
+            };
+            arabicSizeInput.addEventListener('change', applyTextSizes);
+            translitSizeInput.addEventListener('change', applyTextSizes);
+            translationSizeInput.addEventListener('change', applyTextSizes);
+            applyTextSizes();
+            
+            // Auto-play controls
+            autoPlayToggle.addEventListener('change', toggleAutoPlay);
+            delayInput.addEventListener('change', updateAutoPlayDelay);
+            repeatInput.addEventListener('change', updateRepeatCount);
+            
+            // Select first surah by default and load it
+            surahSelect.value = '1';
+            loadSurah();
+        }
+
+        // Load the selected surah
+        async function loadSurah() {
+            const surahId = surahSelect.value;
+            if (!surahId) return;
+            
+            showLoading(true);
+            
+            try {
+                // Load the JSON file from the data folder
+                const response = await fetch(`data/${surahId}.json`);
+                if (!response.ok) {
+                    throw new Error(`Failed to load surah ${surahId}`);
+                }
+                
+                currentSurah = await response.json();
+                currentWordIndex = 0;
+                currentAyah = 1;
+                currentRepeat = 0;
+                
+                if (currentSurah) {
+                    displayCurrentWord();
+                    updateNavigationButtons();
+                    
+                    // Stop auto-play if it's running
+                    if (autoPlayInterval) {
+                        clearInterval(autoPlayInterval);
+                        autoPlayInterval = null;
+                        isPlaying = false;
+                        if (audioStatus) {
+                            audioStatus.style.display = 'none';
+                        }
+                        autoPlayToggle.checked = false;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading surah:', error);
+                alert('Failed to load the selected surah. Please try again.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Show/hide loading indicator
+        function showLoading(show) {
+            loadingElement.style.display = show ? 'block' : 'none';
+            document.querySelector('.card-container').style.display = show ? 'none' : 'flex';
+        }
+
+        // Display the current word with animation
+        function displayCurrentWord(direction = 'right') {
+            if (!currentSurah) return;
+            
+            // Find the current ayah
+            let currentAyahData = null;
+            let wordCount = 0;
+            
+            // Calculate which ayah we're in and the word index within that ayah
+            for (const [ayahKey, ayahData] of Object.entries(currentSurah)) {
+                if (ayahKey === 'meta') continue;
+                
+                const ayahWordCount = ayahData.w.length;
+                if (currentWordIndex < wordCount + ayahWordCount) {
+                    currentAyah = parseInt(ayahKey);
+                    currentAyahData = ayahData;
+                    break;
+                }
+                wordCount += ayahWordCount;
+            }
+            
+            if (!currentAyahData) {
+                // If we've gone beyond the last word, reset to the first word
+                currentWordIndex = 0;
+                currentAyah = 1;
+                currentAyahData = currentSurah[1];
+            }
+            
+            const wordIndexInAyah = currentWordIndex - wordCount;
+            const word = currentAyahData.w[wordIndexInAyah];
+            
+            // Apply slide animation: direction 'next' means advance, 'prev' means go back
+            wordCard.classList.remove('active', 'slide-in', 'slide-out');
+            if (direction === 'next') {
+                // current slides out to the left, new content will appear
+                wordCard.classList.add('slide-out');
+            } else if (direction === 'prev') {
+                // current slides in from right (visually), so use slide-in then show
+                wordCard.classList.add('slide-in');
+            }
+
+            // Slightly shorter delay for smoother feel
+            setTimeout(() => {
+                arabicText.textContent = word.c;
+                transliteration.textContent = word.d;
+                translation.textContent = word.e;
+                
+                wordCard.classList.remove('slide-in', 'slide-out');
+                wordCard.classList.add('active');
+                
+                // Calculate total words
+                const totalWords = Object.values(currentSurah).reduce((total, ayahData) => {
+                    if (ayahData.w) return total + ayahData.w.length;
+                    return total;
+                }, 0);
+                
+                progress.textContent = `الكلمة رقم : ${currentWordIndex + 1} من أصل ${totalWords} (الاّية رقم: ${currentAyah})`;
+                updateRepeatIndicator();
+            }, 180);
+        }
+
+        // Play the current word's audio
+        function playCurrentWord() {
+            if (!currentSurah) return;
+
+            // Surah and ayah padding
+            const surahNum = surahSelect.value;
+            const surahNumPadded = surahNum.toString().padStart(3, '0');
+            const ayahNum = currentAyah.toString().padStart(3, '0');
+
+            // Determine the word index within the current ayah (1-based)
+            // We already computed wordCount when finding currentAyah in displayCurrentWord,
+            // but to be safe, compute index here by iterating words up to currentWordIndex.
+            let wordCountBeforeAyah = 0;
+            for (const [ayahKey, ayahData] of Object.entries(currentSurah)) {
+                if (ayahKey === 'meta') continue;
+                const ayahNumber = parseInt(ayahKey);
+                if (ayahNumber < currentAyah) {
+                    if (ayahData.w) wordCountBeforeAyah += ayahData.w.length;
+                }
+            }
+
+            const indexInAyahZeroBased = currentWordIndex - wordCountBeforeAyah;
+            // Defensive check
+            const wordsInAyah = (currentSurah[currentAyah] && currentSurah[currentAyah].w) ? currentSurah[currentAyah].w.length : 0;
+            const clampedIndex = Math.max(0, Math.min(indexInAyahZeroBased, wordsInAyah - 1));
+            const wordInAyahOneBased = (clampedIndex + 1).toString().padStart(3, '0');
+
+            // Build the corrected audio URL: /words/<surah>/<SURAH_PAD>_<AYAH_PAD>_<WORD_IN_AYAH_PAD>.mp3
+            const audioUrl = `https://audios.quranwbw.com/words/${surahNum}/${surahNumPadded}_${ayahNum}_${wordInAyahOneBased}.mp3`;
+
+            // Play the audio
+            audio.src = audioUrl;
+            audio.play().catch(error => {
+                console.error('Error playing audio:', error);
+                // Fallback: Show a visual indication that we tried to play
+                audioStatus.style.display = 'block';
+                audioStatus.textContent = 'Audio not available';
+                setTimeout(() => {
+                    audioStatus.style.display = 'none';
+                }, 1200);
+            });
+
+            // Visual feedback
+           // audioStatus.style.display = 'block';
+         //   audioStatus.textContent = 'Playing...';
+            audio.onended = () => {
+                currentRepeat++;
+                updateRepeatIndicator();
+                
+                if (currentRepeat < repeatCount) {
+                    // Repeat the same word
+                    setTimeout(() => {
+                        playCurrentWord();
+                    }, 500);
+                } else {
+                    // Reset repeat counter
+                    currentRepeat = 0;
+                    updateRepeatIndicator();
+                    
+                    if (!isPlaying) {
+                        audioStatus.style.display = 'none';
+                    }
+                    
+                    // If auto-play is enabled, move to next word after delay
+                    if (autoPlayToggle.checked && isPlaying) {
+                        setTimeout(() => {
+                            goToNextWord();
+                        }, parseInt(delayInput.value) * 1000);
+                    }
+                }
+            };
+        }
+
+        // Utility: convert rgb or named color to hex (basic)
+        function rgbToHex(rgb) {
+            try {
+                const ctx = document.createElement('canvas').getContext('2d');
+                ctx.fillStyle = rgb;
+                const hex = ctx.fillStyle;
+                return hex;
+            } catch (e) {
+                return '#e3f2fd';
+            }
+        }
+
+        // Navigate to the previous word with animation
+        function goToPreviousWord() {
+            if (currentWordIndex > 0) {
+                currentWordIndex--;
+                currentRepeat = 0;
+                displayCurrentWord('prev');
+                updateNavigationButtons();
+                updateRepeatIndicator();
+            }
+        }
+
+        // Navigate to the next word with animation
+        function goToNextWord() {
+            // Calculate total words
+            const totalWords = Object.values(currentSurah).reduce((total, ayahData) => {
+                if (ayahData.w) return total + ayahData.w.length;
+                return total;
+            }, 0);
+            
+            if (currentWordIndex < totalWords - 1) {
+                currentWordIndex++;
+                currentRepeat = 0;
+                displayCurrentWord('next');
+                updateNavigationButtons();
+                updateRepeatIndicator();
+                
+                // Auto-play if enabled
+                if (autoPlayToggle.checked && isPlaying) {
+                    setTimeout(() => {
+                        playCurrentWord();
+                    }, 500);
+                }
+            } else {
+                // Reached the end, stop auto-play
+                stopAutoPlay();
+            }
+        }
+
+        // Update navigation buttons state
+        function updateNavigationButtons() {
+            const totalWords = Object.values(currentSurah).reduce((total, ayahData) => {
+                if (ayahData.w) return total + ayahData.w.length;
+                return total;
+            }, 0);
+            
+            // If navigation buttons exist (legacy), update their disabled state.
+            if (typeof prevBtn !== 'undefined' && prevBtn) prevBtn.disabled = currentWordIndex === 0;
+            if (typeof nextBtn !== 'undefined' && nextBtn) nextBtn.disabled = currentWordIndex === totalWords - 1;
+        }
+
+        // Handle swipe gestures for touch devices
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            // Reverse mapping: left-to-right swipe (touchEndX > touchStartX) goes to NEXT
+            if (touchEndX > touchStartX + swipeThreshold) {
+                // swipe left-to-right -> next word
+                goToNextWord();
+            } else if (touchEndX < touchStartX - swipeThreshold) {
+                // swipe right-to-left -> previous word
+                goToPreviousWord();
+            }
+        }
+
+        // Handle mouse swipe for desktop
+        function handleMouseSwipe() {
+            const swipeThreshold = 50;
+            // Reverse mapping: mouse drag left-to-right -> next
+            if (mouseUpX > mouseDownX + swipeThreshold) {
+                goToNextWord();
+            } else if (mouseUpX < mouseDownX - swipeThreshold) {
+                goToPreviousWord();
+            }
+        }
+
+        // Toggle auto-play mode
+        function toggleAutoPlay() {
+            if (autoPlayToggle.checked) {
+                // Start auto-play
+                isPlaying = true;
+                if (audioStatus) {
+                    audioStatus.style.display = 'block';
+                    audioStatus.textContent = 'Auto-play';
+                }
+                startAutoPlay();
+            } else {
+                // Stop auto-play
+                isPlaying = false;
+                if (audioStatus) {
+                    audioStatus.style.display = 'none';
+                }
+                stopAutoPlay();
+            }
+        }
+
+        // Start auto-play
+        function startAutoPlay() {
+            playCurrentWord();
+        }
+
+        // Stop auto-play
+        function stopAutoPlay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            }
+            isPlaying = false;
+            if (audioStatus) audioStatus.style.display = 'none';
+            autoPlayToggle.checked = false;
+        }
+
+        // Update auto-play delay
+        function updateAutoPlayDelay() {
+            // The delay is used between words, not during repeats
+            // No need to restart auto-play as it's handled in the audio onended event
+        }
+
+        // Update repeat count
+        function updateRepeatCount() {
+            repeatCount = parseInt(repeatInput.value);
+            updateRepeatIndicator();
+        }
+
+        // Update repeat indicator
+        function updateRepeatIndicator() {
+            if (repeatCount > 1) {
+                repeatIndicator.textContent = `Repeat: ${currentRepeat + 1}/${repeatCount}`;
+            } else {
+                repeatIndicator.textContent = '';
+            }
+        }
+
+        // Initialize the app when the page loads
+        window.addEventListener('DOMContentLoaded', initApp);
+        
+        // Initialize repeat count
+        updateRepeatCount();
+    </script>
+</body>
+</html>
